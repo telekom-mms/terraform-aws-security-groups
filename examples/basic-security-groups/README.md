@@ -14,7 +14,7 @@ This example demonstrates how to use the AWS Security Groups module to create a 
 
 1.  Copy this example to your project.
 2.  Update `variables.tf` with your specific values.
-3.  **Important**: Modify `management_allowed_cidrs` in `main.tf` to your actual management network CIDR.
+3.  **Important**: Modify `allowed_management_cidrs` in `main.tf` to your actual management network CIDR.
 4.  Initialize and apply:
     ```bash
     terraform init

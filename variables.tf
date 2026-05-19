@@ -16,8 +16,9 @@ variable "vpc_id" {
 }
 
 variable "name_prefix" {
-  description = "Prefix for resource names (e.g., 'myapp-prod')"
+  description = "Prefix for resource names (if not provided, will use project-environment pattern)"
   type        = string
+  default     = ""
 }
 
 variable "tags" {
@@ -33,16 +34,22 @@ variable "create_web_tier_sg" {
   default     = true
 }
 
-variable "web_allowed_cidrs" {
-  description = "CIDR blocks allowed to access web tier"
+variable "allowed_web_cidrs" {
+  description = "CIDR blocks allowed to access the web tier"
   type        = list(string)
-  default     = ["0.0.0.0/0"] # Public by default, but should be restricted if possible
+  default     = ["0.0.0.0/0"]
 }
 
 variable "allow_http" {
   description = "Allow HTTP (port 80) traffic - HTTPS (443) is always enabled"
   type        = bool
   default     = false
+}
+
+variable "allowed_https_egress_cidrs" {
+  description = "CIDR blocks allowed for HTTPS egress from managed security groups"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
 }
 
 # Application Tier Configuration
@@ -96,10 +103,9 @@ variable "create_management_sg" {
   default     = true
 }
 
-variable "management_allowed_cidrs" {
+variable "allowed_management_cidrs" {
   description = "CIDR blocks allowed for management access"
   type        = list(string)
-  default     = []
 }
 
 variable "allow_rdp" {
@@ -119,10 +125,10 @@ variable "web_custom_ingress" {
   description = "List of custom ingress rules for web tier"
   type = list(object({
     from_port   = number
-    to_port     = number
-    protocol    = string
+    to_port     = optional(number)
+    protocol    = optional(string, "tcp")
     cidr_blocks = list(string)
-    description = string
+    description = optional(string, "Custom web ingress rule")
   }))
   default = []
 }
@@ -131,10 +137,10 @@ variable "app_custom_ingress" {
   description = "List of custom ingress rules for app tier"
   type = list(object({
     from_port   = number
-    to_port     = number
-    protocol    = string
+    to_port     = optional(number)
+    protocol    = optional(string, "tcp")
     cidr_blocks = list(string)
-    description = string
+    description = optional(string, "Custom application ingress rule")
   }))
   default = []
 }

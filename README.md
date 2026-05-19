@@ -72,12 +72,15 @@ This module implements a hardened 3-tier network security architecture (Web, App
 module "security_groups" {
   source = "./terraform-aws-security-groups"
 
-  vpc_id      = "vpc-12345678"
-  name_prefix = "myapp-prod"
-  
-  web_allowed_cidrs = ["0.0.0.0/0"]
-  app_port          = 8080
-  db_port           = 5432
+  project_name = "myapp"
+  environment  = "prod"
+  vpc_id       = "vpc-12345678"
+  name_prefix  = "myapp-prod"
+
+  allowed_web_cidrs        = ["0.0.0.0/0"]
+  allowed_management_cidrs = ["203.0.113.0/24"]
+  app_port                 = 8080
+  db_port                  = 5432
 }
 ```
 
@@ -87,9 +90,12 @@ module "security_groups" {
 module "sg" {
   source = "./terraform-aws-security-groups"
 
-  vpc_id      = module.vpc.vpc_id
-  name_prefix = "complex-app"
-  
+  project_name             = "complex-app"
+  environment              = "prod"
+  vpc_id                   = module.vpc.vpc_id
+  name_prefix              = "complex-app"
+  allowed_management_cidrs = ["203.0.113.0/24"]
+
   web_custom_ingress = [
     {
       from_port   = 8443
@@ -139,7 +145,7 @@ This module implements the following PSA compliance features (referencing `10-St
 
 ### SSH/RDP Not Working
 
-- Ensure your IP is included in `management_allowed_cidrs`.
+- Ensure your IP is included in `allowed_management_cidrs`.
 - Verify the `create_management_sg = true`.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
