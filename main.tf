@@ -48,8 +48,15 @@ resource "aws_security_group_rule" "web_to_app_egress" {
   from_port                = var.app_port
   to_port                  = var.app_port
   protocol                 = "tcp"
-  source_security_group_id = var.create_app_tier_sg ? aws_security_group.app_tier[0].id : var.app_tier_sg_ids[0]
+  source_security_group_id = var.create_app_tier_sg ? aws_security_group.app_tier[0].id : local.existing_app_tier_sg_id
   security_group_id        = aws_security_group.web_tier[0].id
+
+  lifecycle {
+    precondition {
+      condition     = var.create_app_tier_sg || local.existing_app_tier_sg_id != null
+      error_message = "app_tier_sg_ids must contain at least one security group ID when create_app_tier_sg is false."
+    }
+  }
 }
 
 # PSA Compliance: Req 10 (least privilege network access)
@@ -87,8 +94,15 @@ resource "aws_security_group_rule" "app_from_web_ingress" {
   from_port                = var.app_port
   to_port                  = var.app_port
   protocol                 = "tcp"
-  source_security_group_id = var.create_web_tier_sg ? aws_security_group.web_tier[0].id : var.web_tier_sg_ids[0]
+  source_security_group_id = var.create_web_tier_sg ? aws_security_group.web_tier[0].id : local.existing_web_tier_sg_id
   security_group_id        = aws_security_group.app_tier[0].id
+
+  lifecycle {
+    precondition {
+      condition     = var.create_web_tier_sg || local.existing_web_tier_sg_id != null
+      error_message = "web_tier_sg_ids must contain at least one security group ID when create_web_tier_sg is false."
+    }
+  }
 }
 
 # PSA Compliance: Req 10 (least privilege network access)
@@ -99,8 +113,15 @@ resource "aws_security_group_rule" "app_to_db_egress" {
   from_port                = var.db_port
   to_port                  = var.db_port
   protocol                 = "tcp"
-  source_security_group_id = var.create_db_tier_sg ? aws_security_group.db_tier[0].id : var.db_tier_sg_ids[0]
+  source_security_group_id = var.create_db_tier_sg ? aws_security_group.db_tier[0].id : local.existing_db_tier_sg_id
   security_group_id        = aws_security_group.app_tier[0].id
+
+  lifecycle {
+    precondition {
+      condition     = var.create_db_tier_sg || local.existing_db_tier_sg_id != null
+      error_message = "db_tier_sg_ids must contain at least one security group ID when create_db_tier_sg is false."
+    }
+  }
 }
 
 # PSA Compliance: Req 10 (least privilege network access)
@@ -138,8 +159,15 @@ resource "aws_security_group_rule" "db_from_app_ingress" {
   from_port                = var.db_port
   to_port                  = var.db_port
   protocol                 = "tcp"
-  source_security_group_id = var.create_app_tier_sg ? aws_security_group.app_tier[0].id : var.app_tier_sg_ids[0]
+  source_security_group_id = var.create_app_tier_sg ? aws_security_group.app_tier[0].id : local.existing_app_tier_sg_id
   security_group_id        = aws_security_group.db_tier[0].id
+
+  lifecycle {
+    precondition {
+      condition     = var.create_app_tier_sg || local.existing_app_tier_sg_id != null
+      error_message = "app_tier_sg_ids must contain at least one security group ID when create_app_tier_sg is false."
+    }
+  }
 }
 
 # Management Security Group
