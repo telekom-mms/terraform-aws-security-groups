@@ -12,6 +12,6 @@ env:
 jobs:
   call-terraform-ci:
     if: github.repository != '$TEMPLATE_REPOSITORY'
-    uses: telekom-mms/.github/.github/workflows/terraform-ci.yml@main
+    uses: telekom-mms/.github/.github/workflows/terraform-ci.yml@f99ffae2aab988df08d369c53532520d2e8fefed # main
     with:
       working-directory: examples/basic-security-groups
